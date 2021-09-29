@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load static %}
+{% block style %}
+    <link href="{% static 'css/plugins/dropzone/dropzone.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/dropzone/basic.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css' %}" rel="stylesheet">
+    <style>
+        .bootstrap-tagsinput {
+            display: block !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content  animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Issue list</h5>
+                        <div class="ibox-tools">
+
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="m-b-lg">
+                            <form role="form" class="row">
+                                <div class="col-md-5 flex-column">
+                                    <div class="form-group col-sm-12">
+                                        <label>Assignee</label>
+                                        <select class="select2_demo_2 form-control" multiple="multiple">
+                                            {% for user in users %}
+                                                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-12"><label>Subject</label>
+                                        <input type="text"
+                                               placeholder="Enter Ticket Subject"
+                                               id="ticket_subject"
+                                               class="form-control">
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label>Type</label>
+                                        <select class="form-control" id="ticket_type">
+                                            {% for item in types %}
+                                                <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label>Status</label>
+                                        <select id="ticket_status" class="form-control" disabled>
+                                            {% for item in status %}
+                                                <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label for="">Labels</label>
+                                        <input class="form-control tagsinput" type="text" data-role="tagsinput"
+                                               id="ticket_labels"
+                                               value="Labels"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                     <div class="form-group col-sm-12">
+                                        <label for="">Severity</label>
+                                        <select id="ticket_severity" class="form-control">
+                                            {% for item in severity %}
+                                                <option value="{{ item.0 }}">{{ item.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label>Detail</label>
+                                        <textarea name="ticket_detail" id="ticket_detail" class="form-control" cols="30" rows="12"></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                            <form action="#" class="dropzone" id="dropzoneForm">
+                                <div class="fallback">
+                                    <input name="file" type="file" id="attachments" multiple/>
+                                </div>
+                            </form>
+                            <button class="btn btn-primary mt-2 w-100" id="create-ticket">Create Ticket</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>let formData = new FormData()</script>
+    <script>let attachments = []</script>
+    <script src="{% static 'js/axios.min.js' %}"></script>
+    <script src="{% static 'js/plugins/dropzone/dropzone.js' %}"></script>
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'js/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js' %}"></script>
+    <script>
+        $(".select2_demo_2").select2();
+    </script>
+    <script>
+        function getFileExt(fileName) {
+            fileName = fileName.toLowerCase();
+            return fileName.split('.').pop();
+        }
+
+        function sendRequest(url, method, data) {
+            let r = axios({
+                method: method,
+                url: url,
+                data: data,
+                xsrfCookieName: 'csrftoken',
+                xsrfHeaderName: 'X-CSRFToken',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            return r
+        }
+
+        sendRequest('/api/users/', 'GET')
+            .then(users => {
+                console.log(users.data)
+            })
+
+        function createTicket(e) {
+            formData.append('category', '')
+            formData.append('owner', +{{ request.user.id }})
+            console.log(+{{ request.user.id }})
+            let assignees = $('.select2_demo_2').select2('data').map(s => s.id)
+            for (const id of assignees) {
+                console.log(id)
+                formData.append('assignee', id)
+            }
+            for (const id of attachments) {
+                formData.append('attachments', id)
+            }
+            formData.append('type', $('#ticket_type').val())
+            formData.append('subject', $('#ticket_subject').val())
+            formData.append('status', $('#ticket_status').val())
+            formData.append('detail', $('#ticket_detail').val())
+            formData.append('labels', $('#ticket_labels').val())
+            formData.append('severity', $('#ticket_severity').val() || 2)
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+            console.log(formData)
+            sendRequest('/api/tickets', 'POST', formData)
+                .then(res => {
+                    location.href(`/ticket/view/${res.data.id}`)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+        }
+
+        $('#create-ticket').click(createTicket)
+    </script>
+    <script>
+        Dropzone.options.dropzoneForm = {
+            url: "/api/files/",
+            addRemoveLinks: true,
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 2, // MB
+            dictDefaultMessage: "<strong>Drop files here or click to upload. </strong></br> (This is just a demo dropzone. Selected files are not actually uploaded.)",
+            init: function () {
+                this.on("success", (file, serverResponse) => {
+                    let ext = getFileExt(file.name)
+                    switch (ext) {
+                        case 'jpeg':
+                        case 'png':
+                        case 'jpg':
+                            this.createThumbnailFromUrl(file, "/media/formats/image.png")
+                            break
+                        case 'pdf':
+                            this.createThumbnailFromUrl(file, "/media/formats/pdf.png")
+                            break
+                        case 'mp3':
+                            this.createThumbnailFromUrl(file, "/media/formats/audio.png")
+                            break
+                        case 'mp4':
+                            this.createThumbnailFromUrl(file, "/media/formats/video.png")
+                            break
+                        case 'txt':
+                            this.createThumbnailFromUrl(file, "/media/formats/txt.png")
+                            break
+                        case 'zip' || 'rar':
+                            this.createThumbnailFromUrl(file, "/media/formats/zip.png")
+                            break
+                        default:
+                            this.createThumbnailFromUrl(file, "/media/formats/missing.png")
+                    }
+                    attachments.push(serverResponse.id)
+                })
+                this.on('removedfile', (file) => {
+                    attachments.splice(attachments.indexOf(file.xhr.response.id), 1)
+                })
+                this.on("complete", function () {
+                    console.log("llşlş")
+                    //Do something after the file has been both successfully or unsuccessfully processed.
+                    //This is where I remove all attached files from the input, otherwise they get processed again next time if you havent refreshed the page.
+                }),
+                    this.on("error", function (file, errorMessage, xhr) {
+                        //Do something if there is an error.
+                        //This is where I like to alert to the user what the error was and reload the page after.
+                        console.log(errorMessage)
+                        window.location.reload()
+                    }),
+                    this.on("sending", function (file, xhr, formData) {
+                        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+                    });
+            },
+            removeFilePromise: function () {
+                return new Promise((resolve, reject) => {
+                    let rand = Math.floor(Math.random() * 3)
+                    console.log(rand);
+                    if (rand == 0) reject('didnt remove properly');
+                    if (rand > 0) resolve();
+                })
+            }
+
+
+        };
+    </script>
+    <script>
+        $('.select2_demo_2').on('change.select2', function (e) {
+            $('.select2_demo_2').select2('data').map(s => s.id)
+        });
+    </script>
+{% endblock %}

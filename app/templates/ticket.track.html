@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+{% load split %}
+{% block style %}
+    <style>
+        .blinking {
+            animation: blinkingText 1.2s infinite;
+        }
+
+        @keyframes blinkingText {
+            0% {
+                opacity: 0;
+            }
+            49% {
+                opacity: 0;
+            }
+            60% {
+                opacity: 1;
+            }
+            99% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <script>
+        let type_options = ['', 'Epic', 'Bug', 'Task', 'Subtask', 'Change', 'IT help', 'Incident', 'New feature', 'Problem', 'Service request', 'Support']
+        let status_options = ['', 'Open', 'In Progress', 'Done', 'To Do', 'In Review', 'Under review', 'Approved', 'Cancelled', 'Rejected', 'Draft', 'Published', 'Interviewing', 'Accepted', 'Purchased', 'Requested']
+    </script>
+    <div class="wrapper wrapper-content  animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Issue list</h5>
+                        <div class="ibox-tools">
+                            <a href="" class="btn btn-primary btn-xs">Add new issue</a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+
+                        <div class="m-b-lg">
+
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="Search issue by name...">
+                                <div class="input-group-append">
+                                    <button class="btn btn-white" type="button">Search</button>
+                                </div>
+                            </div>
+
+                            <div class="m-t-md">
+
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-sm btn-white"><i class="fa fa-comments"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white"><i class="fa fa-user"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white"><i class="fa fa-list"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white"><i class="fa fa-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white"><i class="fa fa-print"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white"><i class="fa fa-cogs"></i>
+                                    </button>
+                                </div>
+
+                                <strong>Found {{ tickets|length }} issues.</strong>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover issue-tracker">
+                                <thead>
+                                <th></th>
+                                <th>Ticket İnformations</th>
+                                <th>Assignees</th>
+                                <th>Created at</th>
+                                <th>Severity</th>
+                                <th class="text-right">Labels</th>
+                                </thead>
+                                <tbody>
+                                {% for ticket in tickets %}
+                                    <tr>
+                                        <td>
+                                            <span class="label label-primary">{{ status.ticket.status }}</span>
+                                        </td>
+                                        <td class="issue-info">
+                                            <a href="/ticket/view/{{ ticket.id }}">
+                                                {{ ticket.subject }}
+                                            </a>
+
+                                            <small style="white-space: nowrap;width: 320px;overflow: hidden;text-overflow: ellipsis;">
+                                                {{ ticket.detail }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            {% for user in ticket.assignee.all %}
+                                                <a href="/user/profile/{{ user.id }}" class="small client-avatar"
+                                                   data-toggle="tooltip" data-placement="top"
+                                                   title="{{ user.get_full_name|title }}">
+                                                    <img src="/media/{{ user.profile_image }}" alt="">
+                                                </a>
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {{ ticket.created_at }}
+                                        </td>
+                                        <td>
+                                            {% if ticket.severity == 1 %}
+                                                <span class="label label-danger blinking">Extraordinary</span>
+                                            {% elif ticket.severity == 2 %}
+                                                <span class="label label-warning">High</span>
+                                            {% elif ticket.severity == 3 %}
+                                                <span class="label label-reverse">Moderate</span>
+                                            {% elif ticket.severity == 4 %}
+                                                <span class="label label-success">Low</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-right">
+                                            {% for label in ticket.labels|split %}
+                                                <a href="/search/{{ label }}"
+                                                   class="btn btn-white btn-xs"> {{ label }}</a>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+{% endblock %}
+{% block script %}
+
+
+{% endblock %}

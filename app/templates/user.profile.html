@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load static %}
+{% block style %}
+    <style>
+        .blinking {
+            animation: blinkingText 1.2s infinite;
+        }
+
+        @keyframes blinkingText {
+            0% {
+                opacity: 0;
+            }
+            49% {
+                opacity: 0;
+            }
+            60% {
+                opacity: 1;
+            }
+            99% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+    <link href="{% static 'css/plugins/footable/footable.core.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+
+        <div class="row m-b-lg m-t-lg">
+            <div class="col-md-6">
+
+                <div class="profile-image">
+                    <img src="/media/{{ user.profile_image }}" class="rounded-circle circle-border m-b-md"
+                         alt="profile">
+                </div>
+                <div class="profile-info">
+                    <div class="">
+                        <div>
+                            <h2 class="no-margins">
+                                {{ user.get_full_name|title }}
+                            </h2>
+                            <h4>{{ user.title }}</h4>
+                            <small>
+                                Department : {{ user.department }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <table class="table small m-b-xs">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <strong>{{ tickets|length }}</strong> Assignments
+                        </td>
+                        <td>
+                            <strong>22</strong> Followers
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-lg-6">
+
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>About {{ user.get_full_name|title }}</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <p class="small">
+                            {{ user.bio }}
+                        </p>
+                        <p class="small font-bold">
+                            <span><i class="fa fa-circle text-navy"></i> Online status</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>User Assignments</h5>
+                    </div>
+                    <div class="ibox-content">
+
+                        <table class="footable table table-stripped toggle-arrow-tiny">
+                            <thead>
+                            <tr>
+                                <th data-toggle="true">Ticket</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Severity</th>
+                                <th data-hide="all">Details</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ticket in tickets %}
+                                <tr>
+                                    <td>{{ ticket.subject }}</td>
+                                    <td>
+                                        {% if ticket.category %}
+                                            <a href="/tickets/category/{{ ticket.category }}">Uncategorized</a>
+                                        {% else %}
+                                            <a href="/tickets/category/uncategorized">Uncategorized</a>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ ticket.status }}</td>
+                                    <td>
+                                        {% if ticket.severity == 1 %}
+                                            <span class="label label-danger blinking">Extraordinary</span>
+                                        {% elif ticket.severity == 2 %}
+                                            <span class="label label-warning">High</span>
+                                        {% elif ticket.severity == 3 %}
+                                            <span class="label label-reverse">Moderate</span>
+                                        {% elif ticket.severity == 4 %}
+                                            <span class="label label-success">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ ticket.detail }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+                <div class="ibox ">
+                    <div class="ibox-title">
+                        <h5>User Activities</h5>
+                    </div>
+
+                    <div class="ibox-content">
+
+                        <div class="stream-small">
+                            <span class="label label-primary"> Add</span>
+                            <span class="text-muted"> Today at 10:30:50 pm </span> / <a href="#">Mike Smith</a> Added
+                            new contact to the user group
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-success"> Comment</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-success"> Comment</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-success"> Comment</span>
+                            <span class="text-muted"> Today at 11:43:59 am </span> / <a href="#">Jessica Smith</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-primary"> Add</span>
+                            <span class="text-muted"> Yesterday at 10:02:33 pm </span> / <a href="#">Camila Farter</a>
+                            Added new file to project.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">John Dernex</a> Add new
+                            item to stage zero.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Yesterday at 10:32:12 am </span> / <a href="#">Andrew Williams</a>
+                            Joined to the new group.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 11:43:59 am </span> / <a href="#">Jessica Smith</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">John Dernex</a> Add new
+                            item to stage zero.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Yesterday at 10:32:12 am </span> / <a href="#">Andrew Williams</a>
+                            Joined to the new group.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">John Dernex</a> Add new
+                            item to stage zero.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Yesterday at 10:32:12 am </span> / <a href="#">Andrew Williams</a>
+                            Joined to the new group.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-success"> Comment</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-success"> Comment</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-success"> Comment</span>
+                            <span class="text-muted"> Today at 11:43:59 am </span> / <a href="#">Jessica Smith</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">John Dernex</a> Add new
+                            item to stage zero.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Yesterday at 10:32:12 am </span> / <a href="#">Andrew Williams</a>
+                            Joined to the new group.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-warning"> Activity</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 11:43:59 am </span> / <a href="#">Jessica Smith</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">John Dernex</a> Add new
+                            item to stage zero.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Yesterday at 10:32:12 am </span> / <a href="#">Andrew Williams</a>
+                            Joined to the new group.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 04:30:33 am </span> / <a href="#">Monica Jackson</a>
+                            Commented on public board.
+                        </div>
+                        <div class="stream-small">
+                            <span class="label label-default"> Note</span>
+                            <span class="text-muted"> Today at 08:10:50 am </span> / <a href="#">Michael Miggel</a>
+                            Commented on Ariana profile.
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/plugins/footable/footable.all.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('.footable').footable();
+
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% load static %}
+{% block sidebar %}
+<nav class="navbar-default navbar-static-side" style="position: fixed;" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <a  href="/">
+                        <div class="logom">
+                            <img style="width: 50px" src="{% static 'img/logo.png' %}" alt="">
+                            Ticket SYS
+                        </div>
+                    </a>
+                </div>
+                <div class="logo-element" style="font-size: 24px;letter-spacing: -6px;font-family:'Courier New', Courier, monospace;">
+                    <img style="width: 50px" src="{% static 'img/logo.png' %}" alt="">
+                </div>
+            </li>
+
+            {% if title == 'manager' %}
+            <li {% if request.path == "/yetkilendirme" %} class="active"  {% endif %}>
+                <a href="/yetkilendirme"><i class="fa fa-users"></i> <span class="nav-label">Kullanıcı Yetkilendirme</span></a>
+            </li>
+            {% endif %}
+            <li {% if request.path == "/ticket/add/" %} class="active"  {% endif %}>
+                <a href="/ticket/add/"><i class="fa fa-search"></i> <span class="nav-label">New Ticket</span></a>
+            </li>
+            {% if True %}
+            <li {% if request.path == "/tickets" or request.path == '/' %} class="active"  {% endif %}>
+                <a href="/"><i class="fa fa-file-pdf-o"></i> <span class="nav-label">Tickets</span> </a>
+            </li>
+            {% endif %}
+        </ul>
+
+    </div>
+</nav>
+{% endblock %}
