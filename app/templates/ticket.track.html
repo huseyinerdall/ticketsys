@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% load split %}
+{% load split index %}
 {% block style %}
     <style>
         .blinking {
@@ -37,9 +37,9 @@
             <div class="col-lg-12">
                 <div class="ibox">
                     <div class="ibox-title">
-                        <h5>Issue list</h5>
+                        <h5>Ticket list</h5>
                         <div class="ibox-tools">
-                            <a href="" class="btn btn-primary btn-xs">Add new issue</a>
+                            <a href="/ticket/add/" class="btn btn-primary btn-xs">Add new ticket</a>
                         </div>
                     </div>
                     <div class="ibox-content">
@@ -47,7 +47,7 @@
                         <div class="m-b-lg">
 
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" placeholder="Search issue by name...">
+                                <input type="text" class="form-control" placeholder="Search ticket by name...">
                                 <div class="input-group-append">
                                     <button class="btn btn-white" type="button">Search</button>
                                 </div>
@@ -70,7 +70,7 @@
                                     </button>
                                 </div>
 
-                                <strong>Found {{ tickets|length }} issues.</strong>
+                                <strong>Found {{ tickets|length }} tickets.</strong>
 
 
                             </div>
@@ -91,11 +91,13 @@
                                 {% for ticket in tickets %}
                                     <tr>
                                         <td>
-                                            <span class="label label-primary">{{ status.ticket.status }}</span>
+                                            {% with i=ticket.status|add:'-1' %}
+                                            <span class="label label-primary">{{ TICKET_STATUS_TYPES|index:i }}</span>
+                                            {% endwith %}
                                         </td>
                                         <td class="issue-info">
                                             <a href="/ticket/view/{{ ticket.id }}">
-                                                {{ ticket.subject }}
+                                                {{ ticket.subject|title }}
                                             </a>
 
                                             <small style="white-space: nowrap;width: 320px;overflow: hidden;text-overflow: ellipsis;">

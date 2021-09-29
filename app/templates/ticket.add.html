@@ -31,7 +31,7 @@
                                         <label>Assignee</label>
                                         <select class="select2_demo_2 form-control" multiple="multiple">
                                             {% for user in users %}
-                                                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                                                <option value="{{ user.id }}">{{ user.get_full_name|title }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -130,9 +130,13 @@
             })
 
         function createTicket(e) {
+            toastr.clear()
+            if(Boolean('{{ user.is_authenticated }}' == 'False')){
+                toastr.error(`You have to login add a ticket!`)
+                return
+            }
             formData.append('category', '')
             formData.append('owner', +{{ request.user.id }})
-            console.log(+{{ request.user.id }})
             let assignees = $('.select2_demo_2').select2('data').map(s => s.id)
             for (const id of assignees) {
                 console.log(id)
@@ -148,13 +152,14 @@
             formData.append('labels', $('#ticket_labels').val())
             formData.append('severity', $('#ticket_severity').val() || 2)
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
-            console.log(formData)
             sendRequest('/api/tickets', 'POST', formData)
                 .then(res => {
-                    location.href(`/ticket/view/${res.data.id}`)
+                    location.href = `/ticket/view/${res.data.id}`
                 })
                 .catch(e => {
-                    console.log(e)
+                    for (const key in e.response.data) {
+                        toastr.error(`${key.toUpperCase().big()} ${e.response.data[key]}`)
+                    }
                 })
         }
 
@@ -201,12 +206,8 @@
                 })
                 this.on("complete", function () {
                     console.log("llşlş")
-                    //Do something after the file has been both successfully or unsuccessfully processed.
-                    //This is where I remove all attached files from the input, otherwise they get processed again next time if you havent refreshed the page.
                 }),
                     this.on("error", function (file, errorMessage, xhr) {
-                        //Do something if there is an error.
-                        //This is where I like to alert to the user what the error was and reload the page after.
                         console.log(errorMessage)
                         window.location.reload()
                     }),

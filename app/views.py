@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404
 from .forms import UserRegisterForm
 from django.views.generic import TemplateView
 
-
 class LoginView(TemplateView):
 
     def get(self, request, *args, **kwargs):
@@ -36,6 +35,9 @@ class LoginView(TemplateView):
 class RegisterView(TemplateView):
 
     def get(self, request, *args, **kwargs):
+        print( request.user.is_authenticated)
+        if request.user.is_authenticated:
+            return (HttpResponseRedirect('/'))
         form = UserRegisterForm()
         return render(request, 'register.html', {'form': form})
 
@@ -58,6 +60,9 @@ class RegisterView(TemplateView):
             password = form.cleaned_data.get('password1')
             messages.success(request, 'Welcome {}.Succesfully registered!You can login'.format(username))
             return (HttpResponseRedirect('/login/'))
+        else:
+            messages.warning(request, form.errors)
+            return (HttpResponseRedirect('/register/'))
 
 @login_required
 def ulogout(request):
@@ -86,7 +91,6 @@ class TicketView(TemplateView):
 
     def get(self, request, pk, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(context,pk)
         #ticket = Ticket.objects.get(pk=pk)
         ticket = get_object_or_404(Ticket, pk=pk)
         assignees = ticket.assignee.all()

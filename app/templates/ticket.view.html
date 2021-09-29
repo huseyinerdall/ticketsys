@@ -159,7 +159,7 @@
                                                                         <a href="/media/{{ attachment.file }}" download>
                                                                             <span class="corner"></span>
                                                                             <div class="icon">
-                                                                                <i class="fa fa-file-{{ attachment|filetype }}-o"></i>
+                                                                                <i class="fa fa-file-{{ attachment|filetype }}o"></i>
                                                                             </div>
                                                                             <div class="file-name">
                                                                                 {{ attachment|filename }}
@@ -181,6 +181,7 @@
                             </div>
                         </div>
                         <div class="social-feed-box">
+                            <h3>Comments</h3>
                             <div class="social-footer">
                                 {% for comment in ticket.comments|loadjson %}
                                     <div class="social-comment">
@@ -213,7 +214,7 @@
                                                   id="comment-content"></textarea>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary" id="add-comment">Comment</button>
+                                <button class="btn btn-primary block mt-2" id="add-comment">Comment</button>
 
                             </div>
                         </div>
