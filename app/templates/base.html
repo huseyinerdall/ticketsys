@@ -39,18 +39,12 @@
                 </div>
                 <ul class="nav navbar-top-links navbar-right">
                      {% if user.is_authenticated %}
-                     <li class="mr-6" style="margin-right: 20px">{{ request.user.id }} {{ request.user.get_full_name }}</li>
+                     <li class="mr-6" style="margin-right: 20px"></li>
                      <li>
-                        <i class="fa fa-user-circle-o" style="font-size: 18px"></i><span class="m-r-sm text-muted text-capitalize ml-1">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                        <i class="fa fa-user-circle-o" style="font-size: 18px"></i><span class="m-r-sm text-muted text-capitalize ml-1">{{ request.user.get_full_name }}</span>
                     </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                            <i class="fa fa-bell"></i>  <span class="label label-danger" id="sayi"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-messages" style="max-height: 280px;overflow-y: scroll;" id="bildirim">
 
-                        </ul>
-                    </li>
+
                     <li>
                         <a href="/logout">
                             <i class="fa fa-sign-out"></i> Logout
