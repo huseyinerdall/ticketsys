@@ -2,6 +2,8 @@
 {% load static split %}
 {% load loadjson %}{% load filename fileext filetype userinfo %}
 {% block style %}
+    <link href="{% static 'css/plugins/dropzone/dropzone.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/dropzone/basic.css' %}" rel="stylesheet">
     <style>
         .blinking {
             animation: blinkingText 1.2s infinite;
@@ -76,21 +78,23 @@
                                                             </div>
                                                             <div class="mt-3">
                                                                 <span class="small">Severity: </span>
-                                                                    {% if ticket.severity == 1 %}
-                                                                        <span class="label label-danger blinking">Extraordinary</span>
-                                                                    {% elif ticket.severity == 2 %}
-                                                                        <span class="label label-warning">High</span>
-                                                                    {% elif ticket.severity == 3 %}
-                                                                        <span class="label label-reverse">Moderate</span>
-                                                                    {% elif ticket.severity == 4 %}
-                                                                        <span class="label label-success">Low</span>
-                                                                    {% endif %}
+                                                                {% if ticket.severity == 1 %}
+                                                                    <span class="label label-danger blinking">Extraordinary</span>
+                                                                {% elif ticket.severity == 2 %}
+                                                                    <span class="label label-warning">High</span>
+                                                                {% elif ticket.severity == 3 %}
+                                                                    <span class="label label-reverse">Moderate</span>
+                                                                {% elif ticket.severity == 4 %}
+                                                                    <span class="label label-success">Low</span>
+                                                                {% endif %}
                                                             </div>
                                                             <div class="mt-3">
                                                                 <ul class="tag-list" style="padding: 0">
-                                                                    <li class="small" style="line-height: 3">Tags: </li>
+                                                                    <li class="small" style="line-height: 3">Tags:</li>
                                                                     {% for label in ticket.labels|split %}
-                                                                        <li><a href="/search/{{ label }}"><i class="fa fa-tag"></i> {{ label }}</a></li>
+                                                                        <li><a href="/search/{{ label }}"><i
+                                                                                class="fa fa-tag"></i> {{ label }}</a>
+                                                                        </li>
                                                                     {% endfor %}
                                                                 </ul>
                                                             </div>
@@ -183,10 +187,10 @@
                         <div class="social-feed-box">
                             <h3>Comments</h3>
                             <div class="social-footer">
-                                {% for comment in ticket.comments|loadjson %}
+                                {% for comment in comments %}
                                     <div class="social-comment">
                                         {% if comment.user %}
-                                            {% with res=comment.user|userinfo %}
+                                            {% with res=comment.user %}
                                                 <a href="/user/profile/{{ res.id }}" class="float-left">
                                                     <img alt="image" src="/media/{{ res.profile_image }}">
                                                 </a>
@@ -200,6 +204,26 @@
                                                 </div>
                                             {% endwith %}
                                         {% endif %}
+                                        <div class="attachment">
+                                            {% for attachment in comment.attachments.all %}
+                                                <div class="file-box">
+                                                    <div class="file">
+                                                        <a href="/media/{{ attachment.file }}" download>
+                                                            <span class="corner"></span>
+                                                            <div class="icon">
+                                                                <i class="fa fa-file-{{ attachment|filetype }}o"></i>
+                                                            </div>
+                                                            <div class="file-name">
+                                                                {{ attachment|filename }}
+                                                                <br>
+                                                                <small>{{ comment.created_at }}</small>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                            <div class="clearfix"></div>
+                                        </div>
                                     </div>
                                 {% endfor %}
 
@@ -214,6 +238,11 @@
                                                   id="comment-content"></textarea>
                                     </div>
                                 </div>
+                                <form action="#" class="dropzone" id="dropzoneForm">
+                                    <div class="fallback">
+                                        <input name="file" type="file" id="attachments" multiple/>
+                                    </div>
+                                </form>
                                 <button class="btn btn-primary block mt-2" id="add-comment">Comment</button>
 
                             </div>
@@ -228,6 +257,8 @@
 {% endblock %}
 
 {% block script %}
+    <script>let formData = new FormData()</script>
+    <script>let attachments = []</script>
     <script>
         function load_comments() {
             return '{{ ticket.comments }}';
@@ -236,7 +267,13 @@
         var comments_data = load_comments();
     </script>
     <script src="{% static 'js/axios.min.js' %}"></script>
+    <script src="{% static 'js/plugins/dropzone/dropzone.js' %}"></script>
     <script>
+        function getFileExt(fileName) {
+            fileName = fileName.toLowerCase();
+            return fileName.split('.').pop();
+        }
+
         function sendRequest(url, method, data) {
             let r = axios({
                 method: method,
@@ -253,7 +290,7 @@
         }
     </script>
     <script>
-        function addComment() {
+        /*function addComment() {
             let formData = new FormData()
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
             formData.append('comment', $('#comment-content').val())
@@ -270,7 +307,94 @@
                 })
         }
 
+        $('#add-comment').click(addComment)*/
+        function addComment(e) {
+            toastr.clear()
+            if (Boolean('{{ user.is_authenticated }}' == 'False')) {
+                toastr.error(`You have to login add a ticket!`)
+                return
+            }
+            let temp = []
+            for (const id of attachments) {
+                temp.push(id)
+            }
+            formData.append('attachments', temp)
+            formData.append('user', +{{ request.user.id }})
+            formData.append('comment', $('#comment-content').val())
+            formData.append('pk', {{ ticket.id }})
+            formData.append('created_at', new Date())
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+            sendRequest('/api/ticket/add-comment/', 'POST', formData)
+                .then(res => {
+                    location.reload()
+                })
+                .catch(e => {
+                    toastr.error(`${e}`)
+                })
+        }
+
         $('#add-comment').click(addComment)
+    </script>
+
+    <script>
+        Dropzone.options.dropzoneForm = {
+            url: "/api/files/",
+            addRemoveLinks: true,
+            paramName: "file", // The name that will be used to transfer the file
+            maxFilesize: 2, // MB
+            dictDefaultMessage: "<strong>Drop files here or click to upload. </strong></br>",
+            init: function () {
+                this.on("success", (file, serverResponse) => {
+                    let ext = getFileExt(file.name)
+                    switch (ext) {
+                        case 'jpeg':
+                        case 'png':
+                        case 'jpg':
+                            this.createThumbnailFromUrl(file, "/media/formats/image.png")
+                            break
+                        case 'pdf':
+                            this.createThumbnailFromUrl(file, "/media/formats/pdf.png")
+                            break
+                        case 'mp3':
+                            this.createThumbnailFromUrl(file, "/media/formats/audio.png")
+                            break
+                        case 'mp4':
+                            this.createThumbnailFromUrl(file, "/media/formats/video.png")
+                            break
+                        case 'txt':
+                            this.createThumbnailFromUrl(file, "/media/formats/txt.png")
+                            break
+                        case 'zip' || 'rar':
+                            this.createThumbnailFromUrl(file, "/media/formats/zip.png")
+                            break
+                        default:
+                            this.createThumbnailFromUrl(file, "/media/formats/missing.png")
+                    }
+                    attachments.push(serverResponse.id)
+                })
+                this.on('removedfile', (file) => {
+                    attachments.splice(attachments.indexOf(file.xhr.response.id), 1)
+                })
+                this.on("complete", function () {
+                    console.log("llşlş")
+                }),
+                    this.on("error", function (file, errorMessage, xhr) {
+                        console.log(errorMessage)
+                        window.location.reload()
+                    }),
+                    this.on("sending", function (file, xhr, formData) {
+                        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+                    });
+            },
+            removeFilePromise: function () {
+                return new Promise((resolve, reject) => {
+                    let rand = Math.floor(Math.random() * 3)
+                    console.log(rand);
+                    if (rand == 0) reject('didnt remove properly');
+                    if (rand > 0) resolve();
+                })
+            }
+        }
     </script>
 
 {% endblock %}

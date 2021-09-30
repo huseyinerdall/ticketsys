@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 from . import views
 from app.views import FilteredTicketView, TicketView, RegisterView, TicketsView, LoginView, \
-    TeamsView, UserProfileView
+    TeamsView, UserProfileView, OneTicketView
 from django.conf import settings
 from django.conf.urls.static import static
 from .models import User, Ticket
@@ -18,7 +18,7 @@ urlpatterns = [
                                                            extra_context={'users': User.objects.all(),
                                                                           'types': list(Ticket.type_options),
                                                                           'status': list(Ticket.status_options),
-                                                                          'severity':list(Ticket.severity_options)}),
+                                                                          'severity': list(Ticket.severity_options)}),
                        name='add_ticket'),
                   path('search/<str:label>', FilteredTicketView.as_view()),
                   path('login/', LoginView.as_view(), name='ulogin'),

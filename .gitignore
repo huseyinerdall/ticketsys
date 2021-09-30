@@ -3,8 +3,6 @@
 *.pot
 *.pyc
 __pycache__
-db.sqlite3
-media
 
 # Unit test / coverage reports
 htmlcov/
@@ -40,5 +38,5 @@ node_modules/
 .env.*.local
 .env
 
-#webstorm
+#jetbrains
 .idea/

@@ -130,11 +130,12 @@ class CommentManager():
         return commentsm
 
 class Comment(models.Model):
-    user = models.ForeignKey(User,related_name='comment_owner',on_delete=models.PROTECT)
+    user = models.ForeignKey(User,related_name='comment_owner',on_delete=models.DO_NOTHING,null=True,default=1)
     comment = models.TextField(blank=False)
     created_at = models.DateTimeField(default=timezone.now)
+    attachments = models.ManyToManyField(Attachment,blank=True,default=1)
 
-    objects = CommentManager()
+    #objects = CommentManager()
 
     def __str__(self):
         return str(self.comment)
@@ -198,14 +199,11 @@ class Ticket(models.Model):
     #labels = models.ForeignKey(Label,on_delete=models.SET_NULL,blank=True,null=True)
     severity = models.IntegerField(choices=severity_options)
     attachments = models.ManyToManyField(Attachment)
-    comments = models.TextField(default=[])
+    #comments = models.TextField(default=[])
+    comments = models.ManyToManyField(Comment)
     created_at = models.DateTimeField(default=timezone.now)
     objects = models.Manager()
     ticketobjects = TicketObjects()
-
-    #@property
-    #def owner(self):
-    #    return self.owner
 
     def __str__(self):
         return self.subject

@@ -18,7 +18,7 @@
             <div class="col-lg-12">
                 <div class="ibox">
                     <div class="ibox-title">
-                        <h5>Issue list</h5>
+                        <h5>Add a Ticket</h5>
                         <div class="ibox-tools">
 
                         </div>
@@ -171,7 +171,7 @@
             addRemoveLinks: true,
             paramName: "file", // The name that will be used to transfer the file
             maxFilesize: 2, // MB
-            dictDefaultMessage: "<strong>Drop files here or click to upload. </strong></br> (This is just a demo dropzone. Selected files are not actually uploaded.)",
+            dictDefaultMessage: "<strong>Drop files here or click to upload. </strong></br>",
             init: function () {
                 this.on("success", (file, serverResponse) => {
                     let ext = getFileExt(file.name)
@@ -223,8 +223,6 @@
                     if (rand > 0) resolve();
                 })
             }
-
-
         };
     </script>
     <script>

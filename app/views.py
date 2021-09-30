@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from .forms import UserRegisterForm
 from django.views.generic import TemplateView
 
+
 class LoginView(TemplateView):
 
     def get(self, request, *args, **kwargs):
@@ -32,10 +33,11 @@ class LoginView(TemplateView):
             messages.warning(request, 'Kullanıcı adınızı yada parolanızı yanlış girdiniz.')
             return redirect('/login/')
 
+
 class RegisterView(TemplateView):
 
     def get(self, request, *args, **kwargs):
-        print( request.user.is_authenticated)
+        print(request.user.is_authenticated)
         if request.user.is_authenticated:
             return (HttpResponseRedirect('/'))
         form = UserRegisterForm()
@@ -64,6 +66,7 @@ class RegisterView(TemplateView):
             messages.warning(request, form.errors)
             return (HttpResponseRedirect('/register/'))
 
+
 @login_required
 def ulogout(request):
     logout(request)
@@ -72,6 +75,7 @@ def ulogout(request):
 
 def _403(request):
     return render(request, '403.html', {})
+
 
 class TicketsView(TemplateView):
     template_name = 'ticket.track.html'
@@ -90,16 +94,20 @@ class TicketView(TemplateView):
     template_name = 'ticket.track.html'
 
     def get(self, request, pk, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(request, 'You have to login to look tickets!')
+            return (HttpResponseRedirect('/login/'))
         context = super().get_context_data(**kwargs)
-        #ticket = Ticket.objects.get(pk=pk)
         ticket = get_object_or_404(Ticket, pk=pk)
         assignees = ticket.assignee.all()
         attachments = ticket.attachments.all()
+        comments = ticket.comments.all()
 
         extra_context = {
             'ticket': ticket,
             'assignees': assignees,
-            'attachments': attachments
+            'attachments': attachments,
+            'comments': comments
         }
         return render(request, 'ticket.view.html', extra_context)
 
@@ -126,6 +134,7 @@ class TeamsView(TemplateView):
         extra_context = {}
         return render(request, self.template_name, extra_context)
 
+
 class UserProfileView(TemplateView):
     template_name = 'user.profile.html',
 
@@ -138,3 +147,21 @@ class UserProfileView(TemplateView):
         return render(request, self.template_name, extra_context)
 
 
+class OneTicketView(TemplateView):
+    template_name = 'ticket.add.html',
+
+    def get(self, request, *args, **kwargs):
+
+        if not request.user.is_authenticated:
+            messages.warning(request, 'You have to login to look tickets!')
+            return (HttpResponseRedirect('/login/'))
+
+        context = super().get_context_data(**kwargs)
+
+        extra_context = {
+            'users': User.objects.all(),
+            'types': list(Ticket.type_options),
+            'status': list(Ticket.status_options),
+            'severity': list(Ticket.severity_options)
+        }
+        return render(request, self.template_name, extra_context)

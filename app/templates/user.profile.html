@@ -105,7 +105,7 @@
                             <tbody>
                             {% for ticket in tickets %}
                                 <tr>
-                                    <td>{{ ticket.subject }}</td>
+                                    <td>{{ ticket.subject|title }}</td>
                                     <td>
                                         {% if ticket.category %}
                                             <a href="/tickets/category/{{ ticket.category }}">Uncategorized</a>
