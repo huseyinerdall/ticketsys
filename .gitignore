@@ -15,7 +15,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-
+migrations/
 # Environments
 .env
 .venv
