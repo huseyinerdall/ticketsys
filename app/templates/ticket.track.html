@@ -80,7 +80,7 @@
                         <div class="table-responsive">
                             <table class="table table-hover issue-tracker">
                                 <thead>
-                                <th></th>
+                                <th>Type</th>
                                 <th>Ticket İnformations</th>
                                 <th>Assignees</th>
                                 <th>Created at</th>
@@ -91,8 +91,8 @@
                                 {% for ticket in tickets %}
                                     <tr>
                                         <td>
-                                            {% with i=ticket.status|add:'-1' %}
-                                            <span class="label label-primary">{{ TICKET_STATUS_TYPES|index:i }}</span>
+                                            {% with i=ticket.type|add:'-1' %}
+                                            <span class="label label-primary">{{ TICKET_TYPES|index:i }}</span>
                                             {% endwith %}
                                         </td>
                                         <td class="issue-info">

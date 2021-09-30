@@ -322,7 +322,6 @@
             formData.append('user', +{{ request.user.id }})
             formData.append('comment', $('#comment-content').val())
             formData.append('pk', {{ ticket.id }})
-            formData.append('created_at', new Date())
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
             sendRequest('/api/ticket/add-comment/', 'POST', formData)
                 .then(res => {

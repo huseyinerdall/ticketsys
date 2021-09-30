@@ -55,39 +55,13 @@ class AddCommentToTicket(APIView):
         u = User(pk=user)
         attachments_objects = []
         attachments_ids = []
-        a = None
         for id in attachments.split(','):
             attachments_objects.append(Attachment.objects.get(pk=id))
-            attachments_ids.append(id)
-            print(Attachment.objects.get(pk=id))
             a = Attachment.objects.get(pk=id)
-        c = Comment.objects.create(comment=comment, created_at=today.isoformat(), user=u)
+        c = Comment.objects.create(comment=comment, user=u)
         c.attachments.set(attachments_objects)
-        #print(attachments_objects)
-        #print(*attachments_objects)
-        #c.attachments.set(37)
-
-
         t.comments.add(c)
-
-
-
-
-
-        # if no model exists by this PK, raise a 404 error
-
-        # this is the only field we want to update
-        #t.comments.add(c)
-        #existcomments = json.loads(model.comments)
-        #existcomments.append({"comment": comment,"created_at":created_at,"user":user,"ticket":pk})
-        #data = {"comments": json.dumps(existcomments)}
-        #serializer = TicketSerializer(model, data=data, partial=True)
-        #print(serializer.is_valid())
-        #if serializer.is_valid():
-        #    serializer.save()
-        #    return Response(serializer.data)
-        # return a meaningful error response
-        return Response('serializer.errors')
+        return Response('WROTE')
 
 class SearchTicket(APIView):
 
