@@ -194,7 +194,7 @@ class Ticket(models.Model):
     severity = models.IntegerField(choices=severity_options)
     attachments = models.ManyToManyField(Attachment)
     #comments = models.TextField(default=[])
-    comments = models.ManyToManyField(Comment)
+    comments = models.ManyToManyField(Comment,blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     objects = models.Manager()
     ticketobjects = TicketObjects()

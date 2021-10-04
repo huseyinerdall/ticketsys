@@ -209,7 +209,6 @@
                 }),
                     this.on("error", function (file, errorMessage, xhr) {
                         console.log(errorMessage)
-                        window.location.reload()
                     }),
                     this.on("sending", function (file, xhr, formData) {
                         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
